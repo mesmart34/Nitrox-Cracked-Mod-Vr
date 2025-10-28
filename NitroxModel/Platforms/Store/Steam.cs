@@ -136,20 +136,20 @@ public sealed class Steam : IGamePlatform
 
     public async Task<ProcessEx?> StartGameAsync(string pathToGameExe, string launchArguments, int steamAppId, bool skipSteam)
     {
-        try
-        {
-            using ProcessEx steam = await StartPlatformAsync();
-            if (steam == null)
-            {
-                throw new GamePlatformException(this, "Platform is not running and could not be found.");
-            }
-        }
-        catch (OperationCanceledException ex)
-        {
-            throw new GamePlatformException(this, "Timeout reached while waiting for platform to start. Try again once platform has finished loading.", ex);
-        }
+        // try
+        // {
+        //     using ProcessEx steam = await StartPlatformAsync();
+        //     if (steam == null)
+        //     {
+        //         throw new GamePlatformException(this, "Platform is not running and could not be found.");
+        //     }
+        // }
+        // catch (OperationCanceledException ex)
+        // {
+        //     throw new GamePlatformException(this, "Timeout reached while waiting for platform to start. Try again once platform has finished loading.", ex);
+        // }
 
-        return ProcessEx.From(CreateSteamGameStartInfo(pathToGameExe, GetExeFile(), launchArguments, steamAppId, skipSteam));
+        return ProcessEx.From(CreateSteamGameStartInfo(pathToGameExe, GetExeFile(), launchArguments, steamAppId, true));
     }
 
     private static ProcessStartInfo CreateSteamGameStartInfo(string gameFilePath, string? steamExe, string args, int steamAppId, bool skipSteam)
