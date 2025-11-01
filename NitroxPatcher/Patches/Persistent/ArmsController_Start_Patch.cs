@@ -11,7 +11,7 @@ public sealed partial class ArmsController_Start_Patch : NitroxPatch, IPersisten
 
     public static void Postfix(ArmsController __instance)
     {
-        __instance.Reconfigure(null);
+        // __instance.Reconfigure(null);
         
         Camera mainCamera = SNCameraRoot.main.mainCam;
         if (VrCameraRig.Instance != null)
@@ -20,5 +20,13 @@ public sealed partial class ArmsController_Start_Patch : NitroxPatch, IPersisten
             CoroutineHost.StartCoroutine(VrCameraRig.Instance.SetupGameCameras());
             Log.Info("CAMERA SETUP");
         }
+        
+        // Disable IK
+        __instance.ik.enabled = false;
+        __instance.leftAim.aimer.enabled = false;
+        __instance.rightAim.aimer.enabled = false;
+
+        // Attach
+        __instance.gameObject.AddComponent<VrHands>().Setup(__instance.ik);
     }
 }

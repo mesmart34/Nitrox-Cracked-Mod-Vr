@@ -81,6 +81,8 @@ public class VrCameraRig : MonoBehaviour
     {
         Log.Info("VrCameraRig Start");
         SetupControllers();
+        
+        StartCoroutine(DelayedRecenter(1.0f));
     }
 
     public void SetupControllers()
@@ -144,6 +146,12 @@ public class VrCameraRig : MonoBehaviour
         laserPointer.inputModule = fpsInput;
         laserPointerLeft.inputModule = fpsInput;
         laserPointerUI.inputModule = fpsInput;
+    }
+    
+    public IEnumerator DelayedRecenter(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        VRUtil.Recenter();
     }
 
     public void StealUICamera(Camera camera, bool fromGame = false)
