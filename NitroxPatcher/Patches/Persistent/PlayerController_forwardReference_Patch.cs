@@ -6,11 +6,11 @@ namespace NitroxPatcher.Patches.Persistent;
 
 public sealed partial class PlayerController_forwardReference_Patch : NitroxPatch, IPersistentPatch
 {
-    private static readonly MethodInfo TARGET_METHOD = Reflect.Property((PlayerController t) => t.forwardReference).GetMethod;
+    private static readonly MethodInfo TARGET_METHOD = Reflect.Property((PlayerController t) => t.forwardReference).GetGetMethod();
     
-    public static Transform controllerTransform;
+    private static Transform controllerTransform;
     
-    static bool Prefix(PlayerController __instance, ref Transform __result)
+    public static bool Prefix(PlayerController __instance, ref Transform __result)
     {
         if (Settings.HandBasedTurning)
         {
@@ -21,7 +21,7 @@ public sealed partial class PlayerController_forwardReference_Patch : NitroxPatc
                 controllerTransform = new GameObject().transform;
             }
             controllerTransform.position = MainCamera.camera.transform.position;
-           // controllerTransform.rotation = Settings.LeftHandBasedTurning ? VrCameraRig.GetLeftTargetTansform().rotation : VrCameraRig.GetTargetTansform().rotation; //the laser pointer transform
+            controllerTransform.rotation = Settings.LeftHandBasedTurning ? VrCameraRig.GetLeftTargetTransform()!.rotation : VrCameraRig.GetTargetTransform()!.rotation;
             __result = controllerTransform;
         }
         else

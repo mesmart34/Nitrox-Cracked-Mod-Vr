@@ -18,6 +18,7 @@ public sealed partial class ArmsController_Start_Patch : NitroxPatch, IPersisten
         {
             VrCameraRig.Instance.SetCameraTrackTarget(mainCamera.transform.parent);
             CoroutineHost.StartCoroutine(VrCameraRig.Instance.SetupGameCameras());
+            Log.Info("CAMERA SETUP");
         }
     }
 }

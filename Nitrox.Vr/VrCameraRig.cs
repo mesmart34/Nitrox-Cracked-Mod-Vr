@@ -28,19 +28,52 @@ public class VrCameraRig : MonoBehaviour
     public Transform? rigParentTarget;
     public Camera? uiCamera;
     public Camera? vrCamera;
+    public LaserPointer? laserPointer;
+    public LaserPointer? laserPointerLeft;
+    public LaserPointer? laserPointerUI;
+    public GameObject? worldTarget;
+    public float worldTargetDistance;
     
     public TransformOffset TargetTransform
     {
-        get
-        {
-            return targetTransform;
-        }
         set
         {
             targetTransform = value;
-            // value.Apply(laserPointerUI.transform);
-            // value.Apply(laserPointer.transform);
-            // value.Apply(laserPointerLeft.transform);
+            if (laserPointerUI != null)
+            {
+                value.Apply(laserPointerUI.transform);
+            }
+            if (laserPointer != null)
+            {
+                value.Apply(laserPointer.transform);
+            }
+            if (laserPointerLeft != null)
+            {
+                value.Apply(laserPointerLeft.transform);
+            }
+        }
+    }
+
+    public Camera? UIControllerCamera
+    {
+        get
+        {
+            if (laserPointerUI == null)
+            {
+                return null;
+            }
+            return laserPointerUI.eventCamera;
+        }
+    }
+    public Camera? WorldControllerCamera
+    {
+        get
+        {
+            if (laserPointer == null)
+            {
+                return null;
+            }
+            return laserPointer.eventCamera;
         }
     }
 
@@ -75,6 +108,10 @@ public class VrCameraRig : MonoBehaviour
         Vector3 handOffset = new Vector3(90, 270, 0);
         rightHandTarget.transform.localEulerAngles = handOffset;
         
+        laserPointer = new GameObject(nameof(laserPointer)).WithParent(rightController.transform).AddComponent<LaserPointer>();
+        laserPointerLeft = new GameObject(nameof(laserPointerLeft)).WithParent(leftController.transform).AddComponent<LaserPointer>();
+        laserPointerLeft.gameObject.SetActive(false);
+        laserPointer.disableAfterCreation = true;
         
         uiRig = new GameObject(nameof(uiRig));
         DontDestroyOnLoad(uiRig);
@@ -82,6 +119,9 @@ public class VrCameraRig : MonoBehaviour
         
         leftControllerUI = new GameObject(nameof(leftControllerUI)).WithParent(uiRig.transform);
         rightControllerUI = new GameObject(nameof(rightControllerUI)).WithParent(uiRig.transform);
+        laserPointerUI = new GameObject(nameof(laserPointerUI)).WithParent(rightControllerUI.transform).AddComponent<LaserPointer>();
+        laserPointerUI.doWorldRaycasts = true;
+        laserPointerUI.useUILayer = true;
         
         leftControllerUI.SetActive(false);
         rightControllerUI.SetActive(false);
@@ -99,6 +139,11 @@ public class VrCameraRig : MonoBehaviour
         targetTransform = DefaultTargetTransform;
         
         SetupControllerModels();
+        
+        FPSInputModule? fpsInput = FindObjectOfType<FPSInputModule>();
+        laserPointer.inputModule = fpsInput;
+        laserPointerLeft.inputModule = fpsInput;
+        laserPointerUI.inputModule = fpsInput;
     }
 
     public void StealUICamera(Camera camera, bool fromGame = false)
@@ -150,6 +195,16 @@ public class VrCameraRig : MonoBehaviour
         }
         uiCamera = camera;
         // VRHud.Setup(uiCamera, rightControllerUI.transform);
+    }
+    
+    public void SetWorldTarget(GameObject activeTarget, float activeHitDistance)
+    {
+        worldTarget = activeTarget;
+        worldTargetDistance = activeHitDistance;
+        if (laserPointerUI != null)
+        {
+            laserPointerUI.SetWorldTarget(worldTarget, worldTargetDistance);
+        }
     }
     
     public void StealCamera(Camera camera)
@@ -237,5 +292,35 @@ public class VrCameraRig : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
 
         FindObjectsOfType<uGUI_CanvasScaler>().ForEach(cs => cs.SetDirty());
+    }
+
+    public static Transform? GetTargetTransform()
+    {
+        if (Instance == null)
+        {
+            return null;
+        }
+        
+        if (Instance.laserPointer != null)
+        {
+            return Instance.laserPointer.transform;
+        }
+
+        return null;
+    }
+    
+    public static Transform? GetLeftTargetTransform()
+    {
+        if (Instance == null)
+        {
+            return null;
+        }
+        
+        if (Instance.laserPointerLeft != null)
+        {
+            return Instance.laserPointerLeft.transform;
+        }
+
+        return null;
     }
 }
