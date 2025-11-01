@@ -91,6 +91,14 @@
                 <HintPath>$(GameManagedDir)Assembly-CSharp-firstpass.dll</HintPath>
                 <Private>$(TestLibrary)</Private>
             </Reference>
+            <Reference Include="SteamVR">
+                <HintPath>$(GameManagedDir)SteamVR.dll</HintPath>
+                <Aliases>SteamVRRef</Aliases>
+            </Reference>
+            <Reference Include="SteamVR_Actions">
+                <HintPath>$(GameManagedDir)SteamVR_Actions.dll</HintPath>
+                <Aliases>SteamVRActions</Aliases>
+            </Reference>
 
             <!-- UnityEngine libraries to include -->
             <Reference Include="FMODUnity">

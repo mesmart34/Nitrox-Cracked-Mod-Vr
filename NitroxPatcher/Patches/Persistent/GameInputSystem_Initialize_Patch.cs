@@ -1,13 +1,19 @@
+extern alias SteamVRRef;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
+using Nitrox.Vr;
 using NitroxClient.MonoBehaviours.Gui.Input;
 using NitroxClient.MonoBehaviours.Gui.Input.KeyBindings;
 using NitroxModel.Helper;
+using SteamVRRef::Valve.VR;
 using UnityEngine.InputSystem;
 
 namespace NitroxPatcher.Patches.Persistent;
+
+extern alias SteamVRRef;
+
 
 /// <summary>
 /// Inserts Nitrox's keybinds in the new Subnautica input system
@@ -18,14 +24,20 @@ public partial class GameInputSystem_Initialize_Patch : NitroxPatch, IPersistent
 
     public static void Prefix(GameInputSystem __instance)
     {
-        CachedEnumString<GameInput.Button> actionNames = GameInput.ActionNames;
+        SteamVR.Initialize();
+        SteamVR.settings.trackingSpace = ETrackingUniverseOrigin.TrackingUniverseSeated;
+       
+        SteamVrGameInput.IsSteamVrReady = SteamVR.initializedState == SteamVR.InitializedStates.InitializeSuccess;
+        VROptions.gazeBasedCursor = true;
 
+        CachedEnumString<GameInput.Button> actionNames = GameInput.ActionNames;
+        
         int buttonId = KeyBindingManager.NITROX_BASE_ID;
         foreach (KeyBinding keyBinding in KeyBindingManager.KeyBindings)
         {
             GameInput.Button button = (GameInput.Button)buttonId++;
             actionNames.valueToString[button] = keyBinding.ButtonLabel;
-
+        
             if (!string.IsNullOrEmpty(keyBinding.DefaultKeyboardKey))
             {
                 // See GameInputSystem.bindingsKeyboard definition

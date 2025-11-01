@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetFrameworks>net472;net9.0</TargetFrameworks>
+    </PropertyGroup>
+
+<!--    <ItemGroup>-->
+<!--        &lt;!&ndash; SteamVR + SteamVR Actions: Currenlty prebuilt, should be built from source later &ndash;&gt;-->
+<!--        <Reference Include="SteamVR">-->
+<!--            <HintPath>SteamVR/SteamVR.dll</HintPath>-->
+<!--            <Aliases>SteamVRRef</Aliases>-->
+<!--        </Reference>-->
+<!--        <Reference Include="SteamVR_Actions">-->
+<!--            <HintPath>SteamVR/SteamVR_Actions.dll</HintPath>-->
+<!--            <Aliases>SteamVRActions</Aliases>-->
+<!--        </Reference>-->
+<!--    </ItemGroup>-->
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NitroxModel\NitroxModel.csproj" />
+    </ItemGroup>
+    
+</Project>

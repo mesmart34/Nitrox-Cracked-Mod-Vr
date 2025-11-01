@@ -1,5 +1,11 @@
+extern alias SteamVRRef;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using Nitrox.Vr;
 using NitroxClient.MonoBehaviours.Discord;
 using NitroxClient.MonoBehaviours.Gui.MainMenu;
+using SteamVRRef::Valve.VR;
 using UnityEngine;
 
 namespace NitroxClient.MonoBehaviours;
@@ -17,6 +23,19 @@ public class NitroxBootstrapper : MonoBehaviour
         gameObject.AddComponent<SceneCleanerPreserve>();
         gameObject.AddComponent<NitroxMainMenuModifications>();
         gameObject.AddComponent<DiscordClient>();
+        
+        string subnauticaManagedPath = Path.Combine(Application.dataPath, "Managed");
+        
+        string[] dllsToLoad = [
+            Path.Combine(subnauticaManagedPath, "SteamVR.dll"),
+            Path.Combine(subnauticaManagedPath, "SteamVR_Actions.dll")
+        ];
+        foreach (string dll in dllsToLoad)
+        {
+            string pathToDll = dll.Replace("\\", "/");
+            Assembly.Load(pathToDll);
+        }
+        
 
 #if DEBUG
         EnableDeveloperFeatures();
