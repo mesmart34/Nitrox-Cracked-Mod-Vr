@@ -22,7 +22,7 @@ public class Settings
     public static bool InvertYAxis;
     public static event BooleanChanged InvertYAxisChanged;
 
-    public static bool AlwaysShowControllers;
+    public static bool AlwaysShowControllers = true;
     public static event BooleanChanged AlwaysShowControllersChanged;
 
     public static bool FullBody = false;
@@ -40,7 +40,7 @@ public class Settings
     public static bool AreGameHapticsEnabled = false;
     public static bool AreUIHapticsEnabled = false;
     public static bool ArticulatedHands = false;
-    public static bool HandBasedTurning = false;
+    public static bool HandBasedTurning = true;
     public static bool LeftHandBasedTurning = false;
 
     //Ambient Occlusion Settings

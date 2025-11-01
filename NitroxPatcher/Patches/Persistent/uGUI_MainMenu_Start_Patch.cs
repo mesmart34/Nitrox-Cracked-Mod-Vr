@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Reflection;
 using HarmonyLib;
+using Nitrox.Vr;
 using NitroxClient.Communication.Abstract;
 using NitroxClient.Communication.MultiplayerSession;
 using NitroxClient.MonoBehaviours.Gui.MainMenu.ServerJoin;
@@ -25,6 +26,8 @@ public sealed partial class uGUI_MainMenu_Start_Patch : NitroxPatch, IPersistent
 
     public static void Postfix()
     {
+        VrMainMenu.SetupMainMenu();
+        
         if (EndCreditsManager_OnLateUpdate_Patch.EndCreditsTriggered)
         {
             SpawnThankDialog();
