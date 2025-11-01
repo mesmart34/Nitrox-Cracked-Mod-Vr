@@ -30,25 +30,25 @@ public partial class GameInputSystem_Initialize_Patch : NitroxPatch, IPersistent
         SteamVrGameInput.IsSteamVrReady = SteamVR.initializedState == SteamVR.InitializedStates.InitializeSuccess;
         VROptions.gazeBasedCursor = true;
 
-        CachedEnumString<GameInput.Button> actionNames = GameInput.ActionNames;
-        
-        int buttonId = KeyBindingManager.NITROX_BASE_ID;
-        foreach (KeyBinding keyBinding in KeyBindingManager.KeyBindings)
-        {
-            GameInput.Button button = (GameInput.Button)buttonId++;
-            actionNames.valueToString[button] = keyBinding.ButtonLabel;
-        
-            if (!string.IsNullOrEmpty(keyBinding.DefaultKeyboardKey))
-            {
-                // See GameInputSystem.bindingsKeyboard definition
-                GameInputSystem.bindingsKeyboard.Add(button, $"<Keyboard>/{keyBinding.DefaultKeyboardKey}");
-            }
-            if (!string.IsNullOrEmpty(keyBinding.DefaultControllerKey))
-            {
-                // See GameInputSystem.bindingsController definition
-                GameInputSystem.bindingsController.Add(button, $"<Gamepad>/{keyBinding.DefaultControllerKey}");
-            }
-        }
+        // CachedEnumString<GameInput.Button> actionNames = GameInput.ActionNames;
+        //
+        // int buttonId = KeyBindingManager.NITROX_BASE_ID;
+        // foreach (KeyBinding keyBinding in KeyBindingManager.KeyBindings)
+        // {
+        //     GameInput.Button button = (GameInput.Button)buttonId++;
+        //     actionNames.valueToString[button] = keyBinding.ButtonLabel;
+        //
+        //     if (!string.IsNullOrEmpty(keyBinding.DefaultKeyboardKey))
+        //     {
+        //         // See GameInputSystem.bindingsKeyboard definition
+        //         GameInputSystem.bindingsKeyboard.Add(button, $"<Keyboard>/{keyBinding.DefaultKeyboardKey}");
+        //     }
+        //     if (!string.IsNullOrEmpty(keyBinding.DefaultControllerKey))
+        //     {
+        //         // See GameInputSystem.bindingsController definition
+        //         GameInputSystem.bindingsController.Add(button, $"<Gamepad>/{keyBinding.DefaultControllerKey}");
+        //     }
+        // }
     }
 
     /*
@@ -58,30 +58,30 @@ public partial class GameInputSystem_Initialize_Patch : NitroxPatch, IPersistent
      * GameInputSystem_Initialize_Patch.RegisterKeybindsActions(this); <--- [INSERTED LINE]
      * this.actionMapGameplay.Enable();
      */
-    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-    {
-        return new CodeMatcher(instructions).MatchStartForward([
-                                                new(OpCodes.Ldarg_0),
-                                                new(OpCodes.Ldfld),
-                                                new(OpCodes.Callvirt, Reflect.Method((InputActionMap t) => t.Enable()))
-                                            ])
-                                            .Insert([
-                                                new CodeInstruction(OpCodes.Ldarg_0),
-                                                new CodeInstruction(OpCodes.Call, Reflect.Method(() => RegisterKeybindsActions(default)))
-                                            ])
-                                            .InstructionEnumeration();
-    }
-    
-    /// <summary>
-    /// Set the actions callbacks for our own keybindings once they're actually created only
-    /// </summary>
-    public static void RegisterKeybindsActions(GameInputSystem gameInputSystem)
-    {
-        int buttonId = KeyBindingManager.NITROX_BASE_ID;
-        foreach (KeyBinding keyBinding in KeyBindingManager.KeyBindings)
-        {
-            GameInput.Button button = (GameInput.Button)buttonId++;
-            gameInputSystem.actions[button].started += keyBinding.Execute;
-        }
-    }
+    // public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    // {
+    //     return new CodeMatcher(instructions).MatchStartForward([
+    //                                             new(OpCodes.Ldarg_0),
+    //                                             new(OpCodes.Ldfld),
+    //                                             new(OpCodes.Callvirt, Reflect.Method((InputActionMap t) => t.Enable()))
+    //                                         ])
+    //                                         .Insert([
+    //                                             new CodeInstruction(OpCodes.Ldarg_0),
+    //                                             new CodeInstruction(OpCodes.Call, Reflect.Method(() => RegisterKeybindsActions(default)))
+    //                                         ])
+    //                                         .InstructionEnumeration();
+    // }
+    //
+    // /// <summary>
+    // /// Set the actions callbacks for our own keybindings once they're actually created only
+    // /// </summary>
+    // public static void RegisterKeybindsActions(GameInputSystem gameInputSystem)
+    // {
+    //     int buttonId = KeyBindingManager.NITROX_BASE_ID;
+    //     foreach (KeyBinding keyBinding in KeyBindingManager.KeyBindings)
+    //     {
+    //         GameInput.Button button = (GameInput.Button)buttonId++;
+    //         gameInputSystem.actions[button].started += keyBinding.Execute;
+    //     }
+    // }
 }
