@@ -6,7 +6,7 @@ namespace NitroxPatcher.Patches.Persistent;
 
 public sealed partial class GameInput_AnyKeyDown_Patch : NitroxPatch, IPersistentPatch
 {
-    private static readonly MethodInfo TARGET_METHOD = Reflect.Property((() => GameInput.AnyKeyDown)).GetMethod;
+    private static readonly MethodInfo TARGET_METHOD = Reflect.Property((() => GameInput.AnyKeyDown)).GetGetMethod();
 
     public static void Prefix(ref bool __result)
     {

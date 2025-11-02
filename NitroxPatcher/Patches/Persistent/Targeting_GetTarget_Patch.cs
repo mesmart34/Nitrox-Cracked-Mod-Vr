@@ -9,7 +9,7 @@ namespace NitroxPatcher.Patches.Persistent;
 
 public sealed partial class Targeting_GetTarget_Patch : NitroxPatch, IPersistentPatch
 {
-    private static readonly MethodInfo TARGET_METHOD = AccessTools.Method(typeof(Targeting), "GetTarget", [typeof(float), typeof(GameObject).MakeByRefType(), typeof(float).MakeByRefType()]);
+    private static readonly MethodInfo TARGET_METHOD = Reflect.Method(() => Targeting.GetTarget(default, default, out Reflect.Ref<GameObject>.Field, out Reflect.Ref<float>.Field));
     
     public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {

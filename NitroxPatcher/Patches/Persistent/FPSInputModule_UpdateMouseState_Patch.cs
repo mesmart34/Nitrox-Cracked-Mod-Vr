@@ -19,7 +19,7 @@ namespace NitroxPatcher.Patches.Persistent
 
         public static void Prefix(FPSInputModule __instance, PointerEventData leftData)
         {
-            if (leftData != null && __instance.lastRaycastResult.isValid)
+            if (leftData != null)
             {
                 leftData.position = __instance.lastRaycastResult.worldPosition;
             }
