@@ -9,7 +9,8 @@ public static class SteamVrGameInput
 {
     public static bool IsSteamVrReady;
     public static bool InputLocked = false;
-    
+    public static bool SnapTurned = false;
+
     public static bool ShouldIgnore(GameInput.Button action)
     {
         return !IsSteamVrReady || InputLocked

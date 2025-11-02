@@ -8,7 +8,9 @@ namespace NitroxPatcher.Patches.Persistent;
 
 public sealed partial class FPSInputModule_OnUpdate_Patch : NitroxPatch, IPersistentPatch
 {
-    static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    private static readonly MethodInfo TARGET_METHOD = Reflect.Method((FPSInputModule t) => t.OnUpdate());
+
+    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
         MethodInfo getter = AccessTools.DeclaredPropertyGetter(typeof(BaseInputModule), "eventSystem");
         // Snippet to print each instruction before removal

@@ -13,7 +13,7 @@ using SteamVRRef.Valve.VR;
 public class VrCameraRig : MonoBehaviour
 {
     public static VrCameraRig? Instance;
-    public static readonly TransformOffset DefaultTargetTransform = new TransformOffset(Vector3.zero, new Vector3(45, 0, 0));
+    private static readonly TransformOffset DefaultTargetTransform = new TransformOffset(Vector3.zero, new Vector3(45, 0, 0));
     
     private TransformOffset targetTransform;
     private GameObject? controllerModelLeft;
@@ -58,22 +58,14 @@ public class VrCameraRig : MonoBehaviour
     {
         get
         {
-            if (laserPointerUI == null)
-            {
-                return null;
-            }
-            return laserPointerUI.eventCamera;
+            return laserPointerUI == null ? null : laserPointerUI.eventCamera;
         }
     }
     public Camera? WorldControllerCamera
     {
         get
         {
-            if (laserPointer == null)
-            {
-                return null;
-            }
-            return laserPointer.eventCamera;
+            return laserPointer == null ? null : laserPointer.eventCamera;
         }
     }
 
@@ -147,8 +139,8 @@ public class VrCameraRig : MonoBehaviour
         laserPointerLeft.inputModule = fpsInput;
         laserPointerUI.inputModule = fpsInput;
     }
-    
-    public IEnumerator DelayedRecenter(float delay)
+
+    private IEnumerator DelayedRecenter(float delay)
     {
         yield return new WaitForSeconds(delay);
         VRUtil.Recenter();
@@ -167,10 +159,6 @@ public class VrCameraRig : MonoBehaviour
 
             if (fromGame)
             {
-                // This fixes a weird issue I had, where the UI Camera from the game would behave like it wasnt moving
-                // even though the transform was changing properly.
-                // Maybe it is because the tracking was once disabled in the main game, but I am not sure, since I tried enabling it too.
-                // Copying the properties from the main camera and setting up the original important properties fixed it.
                 uiRig.transform.position = Vector3.zero;
                 int oldMask = camera.cullingMask;
                 CameraClearFlags oldClear = camera.clearFlags;
@@ -190,7 +178,7 @@ public class VrCameraRig : MonoBehaviour
 
                 // Set all canvas scalers to static, which makes UI better usable
                 FindObjectsOfType<uGUI_CanvasScaler>().Where(obj => !obj.name.Contains("PDA")).ForEach(cs => cs.vrMode = uGUI_CanvasScaler.Mode.Static);
-                // SetupPDA();
+                SetupPDA();
                 // VrQuickSlots = new GameObject("VRQuickSlots").ResetTransform().AddComponent<VRQuickSlots>();
                 // VrQuickSlots.Setup(SteamVR_Actions.subnautica_OpenQuickSlotWheel);
             }
@@ -201,10 +189,48 @@ public class VrCameraRig : MonoBehaviour
                 camera.transform.localRotation = Quaternion.identity;
             }
         }
+        
         uiCamera = camera;
-        // VRHud.Setup(uiCamera, rightControllerUI.transform);
+        if (rightControllerUI != null)
+        {
+            VrHud.Setup(uiCamera, rightControllerUI.transform);
+        }
     }
-    
+
+    private void SetupPDA()
+    {
+        // Move the quickslots to bottom of PDA bottom left and make it bigger
+        uGUI_PDA? pda = uGUI_PDA.main;
+        Transform targetParent = pda.tabInventory.transform;
+        uGUI_QuickSlots? qs = FindObjectOfType<uGUI_QuickSlots>();
+        Transform qstf = qs.transform;
+
+        qstf.parent = targetParent;
+        qstf.localPosition = new Vector3(-250, -455, 4f);
+        qstf.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+        qstf.localRotation = Quaternion.identity;
+
+        // Add Pasuse Menu Button to PDA to PDA
+        uGUI_Dialog? dialog = pda.GetComponentInChildren<uGUI_Dialog>(true);
+        uGUI_DialogButton? buttonPrefab = dialog.buttonPrefab;
+        uGUI_DialogButton? button = Instantiate(buttonPrefab, targetParent).GetComponent<uGUI_DialogButton>();
+        button.button.transform.parent = targetParent;
+        button.button.gameObject.gameObject.name = "PauseMenuButton";
+        button.text.text = "Pause Menu";
+        button.button.onClick.RemoveAllListeners();
+        button.button.onClick.AddListener(() =>
+        {
+            IngameMenu.main.Open();
+        });
+        // Move it to the bottom right
+        button.rectTransform.anchoredPosition = new Vector2(1100, 50);
+        button.rectTransform.pivot = new Vector2(1, 0);
+        button.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 300);
+        button.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 100);
+        button.rectTransform.ForceUpdateRectTransforms();
+        button.rectTransform.GetComponentsInChildren<RectTransform>().ForEach(rt => rt.ForceUpdateRectTransforms());
+    }
+
     public void SetWorldTarget(GameObject activeTarget, float activeHitDistance)
     {
         worldTarget = activeTarget;
@@ -269,18 +295,23 @@ public class VrCameraRig : MonoBehaviour
     
     public void UpdateShowControllers()
     {
+        Log.Info("UpdateShowControllers begin");
+      
         bool inMainMenu = !uGUI.isMainLevel;
         bool alwaysShow = Settings.AlwaysShowControllers;
 
         if (controllerModelLeft != null)
         {
+            Log.Info("UpdateShowControllers LEFT");
             controllerModelLeft.SetActive(alwaysShow || inMainMenu);
         }
         
         if (controllerModelRight != null)
         {
+            Log.Info("UpdateShowControllers RIGHT");
             controllerModelRight.SetActive(alwaysShow || inMainMenu);
         }
+        Log.Info("UpdateShowControllers end");
     }
 
     public void SetCameraTrackTarget(Transform target)
@@ -296,6 +327,7 @@ public class VrCameraRig : MonoBehaviour
             rig.StealCamera(SNCameraRoot.main.mainCamera);
             yield return new WaitForSeconds(1.0f);
             rig.StealUICamera(SNCameraRoot.main.guiCamera, true);
+            Log.Info("SetupGameCameras IS WORKING");
         }
         yield return new WaitForSeconds(0.1f);
 

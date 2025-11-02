@@ -1,4 +1,5 @@
 using System.Reflection;
+using Nitrox.Vr;
 using NitroxClient.GameLogic;
 using NitroxModel.Helper;
 
@@ -11,5 +12,10 @@ public sealed partial class Vehicle_OnPilotModeBegin_Patch : NitroxPatch, IDynam
     public static void Prefix(Vehicle __instance)
     {
         Resolve<Vehicles>().BroadcastOnPilotModeChanged(__instance.gameObject, true);
+        
+        if (__instance is SeaMoth || __instance is Exosuit)
+        {
+            VrHud.OnEnterVehicle();
+        }
     }
 }

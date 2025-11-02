@@ -16,7 +16,6 @@ public sealed partial class GameInput_GetButtonDown_Patch : NitroxPatch, IPersis
         {
             return false;
         }
-        Log.Info(actionName);
         
         __result = SteamVRRef::Valve.VR.SteamVR_Input.GetStateDown(actionName, SteamVRRef::Valve.VR.SteamVR_Input_Sources.Any);
         return false;

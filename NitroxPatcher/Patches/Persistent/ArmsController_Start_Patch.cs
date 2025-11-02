@@ -11,16 +11,15 @@ public sealed partial class ArmsController_Start_Patch : NitroxPatch, IPersisten
 
     public static void Postfix(ArmsController __instance)
     {
-        // __instance.Reconfigure(null);
-        
+        __instance.Reconfigure(null);
+        Log.Info("ArmsController_Start");
         Camera mainCamera = SNCameraRoot.main.mainCam;
         if (VrCameraRig.Instance != null)
         {
             VrCameraRig.Instance.SetCameraTrackTarget(mainCamera.transform.parent);
             CoroutineHost.StartCoroutine(VrCameraRig.Instance.SetupGameCameras());
-            Log.Info("CAMERA SETUP");
         }
-        
+
         // Disable IK
         __instance.ik.enabled = false;
         __instance.leftAim.aimer.enabled = false;

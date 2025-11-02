@@ -9,13 +9,12 @@ using NitroxClient.MonoBehaviours.Gui.MainMenu.ServerJoin;
 using NitroxModel.DataStructures.Unity;
 using NitroxModel.DataStructures.Util;
 using NitroxModel.MultiplayerSession;
-using NitroxPatcher.Patches.Dynamic;
 using UnityEngine;
 
-namespace NitroxPatcher.Patches.Persistent;
+namespace NitroxPatcher.Patches.Dynamic;
 
 // TODO: Rework this to be less ad hoc and more robust with command line arguments
-public sealed partial class uGUI_MainMenu_Start_Patch : NitroxPatch, IPersistentPatch
+public sealed partial class uGUI_MainMenu_Start_Patch : NitroxPatch, IDynamicPatch
 {
     private static readonly MethodInfo TARGET_METHOD = AccessTools.EnumeratorMoveNext(Reflect.Method((uGUI_MainMenu t) => t.Start()));
 

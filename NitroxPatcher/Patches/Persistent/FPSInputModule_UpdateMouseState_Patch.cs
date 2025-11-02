@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Nitrox.Vr;
 using UnityEngine;
@@ -24,60 +25,91 @@ namespace NitroxPatcher.Patches.Persistent
             }
         }
 
-        public static bool GetPointerData(FPSInputModule instance, int id, out PointerEventData data, bool create)
+        private static bool GetPointerData(FPSInputModule instance, int id, out PointerEventData data, bool create)
         {
             data = null;
-            if (instance == null) return false;
-
-            var pointerDataField = typeof(FPSInputModule).GetField("m_PointerData", BindingFlags.Instance | BindingFlags.NonPublic);
-            var pointerData = pointerDataField?.GetValue(instance) as System.Collections.Generic.Dictionary<int, PointerEventData>;
-            if (pointerData == null) return false;
-
-            if (!pointerData.TryGetValue(id, out data) && create)
+            if (instance == null)
             {
-                // Access protected eventSystem via reflection
-                var eventSystemProp = typeof(FPSInputModule).GetProperty("eventSystem", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                var eventSystem = eventSystemProp?.GetValue(instance) as EventSystem;
-                if (eventSystem == null) return false;
-
-                data = new PointerEventData(eventSystem);
-                pointerData[id] = data;
+                return false;
             }
+
+            FieldInfo pointerDataField = typeof(FPSInputModule).GetField("m_PointerData", BindingFlags.Instance | BindingFlags.NonPublic);
+            Dictionary<int, PointerEventData> pointerData = pointerDataField?.GetValue(instance) as System.Collections.Generic.Dictionary<int, PointerEventData>;
+            if (pointerData == null)
+            {
+                return false;
+            }
+
+            if (pointerData.TryGetValue(id, out data) || !create)
+            {
+                return data != null;
+            }
+            
+            // Access protected eventSystem via reflection
+            PropertyInfo eventSystemProp = typeof(FPSInputModule).GetProperty("eventSystem", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+            EventSystem eventSystem = eventSystemProp?.GetValue(instance) as EventSystem;
+            if (eventSystem == null)
+            {
+                return false;
+            }
+
+            data = new PointerEventData(eventSystem);
+            pointerData[id] = data;
 
             return data != null;
         }
 
         public static void Postfix(FPSInputModule __instance, PointerEventData leftData)
         {
-            if (!GetPointerData(__instance, -3, out PointerEventData data2, create: true)) return;
-            if (leftData == null || data2 == null) return;
+            if (!GetPointerData(__instance, -3, out PointerEventData data2, create: true))
+            {
+                return;
+            }
+            if (leftData == null || data2 == null)
+            {
+                return;
+            }
 
             __instance.CopyFromTo(leftData, data2);
             data2.button = PointerEventData.InputButton.Middle;
 
-            if (GameInput.PrimaryDevice != GameInput.Device.Controller) return;
+            if (GameInput.PrimaryDevice != GameInput.Device.Controller)
+            {
+                return;
+            }
 
             bool buttonDown = GameInput.GetButtonDown(GameInput.button2);
             bool buttonUp = GameInput.GetButtonUp(GameInput.button2);
 
             // Reflection for MouseState
-            var mouseState = m_MouseStateField?.GetValue(__instance);
-            if (mouseState == null) return;
-
-            var buttonState = getButtonState.Invoke(mouseState, new object[] { PointerEventData.InputButton.Middle });
-            if (buttonState == null) return;
-
-            var buttonStateField = buttonState.GetType().GetField("buttonState", BindingFlags.Instance | BindingFlags.Public);
-            var framePressState = (PointerEventData.FramePressState)buttonStateField.GetValue(buttonState);
-
-            if (framePressState != PointerEventData.FramePressState.NotChanged) return;
-
-            setButtonState.Invoke(mouseState, new object[]
+            object mouseState = m_MouseStateField?.GetValue(__instance);
+            if (mouseState == null)
             {
+                return;
+            }
+
+            object buttonState = getButtonState.Invoke(mouseState, [PointerEventData.InputButton.Middle]);
+            if (buttonState == null)
+            {
+                return;
+            }
+
+            FieldInfo buttonStateField = buttonState.GetType().GetField("buttonState", BindingFlags.Instance | BindingFlags.Public);
+            if (buttonStateField != null)
+            {
+                PointerEventData.FramePressState framePressState = (PointerEventData.FramePressState)buttonStateField.GetValue(buttonState)!;
+
+                if (framePressState != PointerEventData.FramePressState.NotChanged)
+                {
+                    return;
+                }
+            }
+
+            setButtonState.Invoke(mouseState, [
                 PointerEventData.InputButton.Middle,
                 FPSInputModule.ConstructPressState(buttonDown, buttonUp),
                 data2
-            });
+            ]);
         }
     }
 }

@@ -1,8 +1,8 @@
 using System.Reflection;
+using Nitrox.Vr;
 using NitroxClient.GameLogic;
 using NitroxClient.MonoBehaviours;
 using NitroxModel.DataStructures;
-using NitroxModel.Helper;
 
 namespace NitroxPatcher.Patches.Dynamic;
 
@@ -22,6 +22,11 @@ public sealed partial class Vehicle_OnPilotModeEnd_Patch : NitroxPatch, IDynamic
         if (__instance.TryGetIdOrWarn(out NitroxId id))
         {
             Resolve<SimulationOwnership>().RequestSimulationLock(id, SimulationLockType.TRANSIENT);
+        }
+        
+        if (__instance is SeaMoth || __instance is Exosuit)
+        {
+            VrHud.OnExitVehicle();
         }
     }
 }
