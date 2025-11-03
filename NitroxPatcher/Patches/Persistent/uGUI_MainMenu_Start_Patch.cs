@@ -1,7 +1,10 @@
+extern alias SteamVRRef;
+extern alias SteamVRActions;
 using System;
 using System.Net;
 using System.Reflection;
 using HarmonyLib;
+using Nitrox.Vr;
 using NitroxClient.Communication.Abstract;
 using NitroxClient.Communication.MultiplayerSession;
 using NitroxClient.MonoBehaviours.Gui.MainMenu.ServerJoin;
@@ -9,7 +12,11 @@ using NitroxModel.DataStructures.Unity;
 using NitroxModel.DataStructures.Util;
 using NitroxModel.MultiplayerSession;
 using NitroxPatcher.Patches.Dynamic;
+using SteamVRRef::Valve.VR;
+using SteamVRActions::Valve.VR;
 using UnityEngine;
+using UnityEngine.XR;
+using static UnityEngine.Object;
 
 namespace NitroxPatcher.Patches.Persistent;
 
@@ -28,6 +35,13 @@ public sealed partial class uGUI_MainMenu_Start_Patch : NitroxPatch, IPersistent
         if (EndCreditsManager_OnLateUpdate_Patch.EndCreditsTriggered)
         {
             SpawnThankDialog();
+        }
+        
+        if (Settings.IsVrEnabled)
+        {
+            GameObject controllerRig = new(nameof(ControllerRig));
+            ControllerRig.Instance = controllerRig.AddComponent<ControllerRig>();
+            DontDestroyOnLoad(controllerRig);
         }
 
 #if DEBUG
@@ -103,4 +117,5 @@ public sealed partial class uGUI_MainMenu_Start_Patch : NitroxPatch, IPersistent
         }
     }
 #endif
+    
 }

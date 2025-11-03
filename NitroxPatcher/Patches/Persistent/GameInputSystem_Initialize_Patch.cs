@@ -1,4 +1,3 @@
-extern alias SteamVRRef;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -7,7 +6,6 @@ using Nitrox.Vr;
 using NitroxClient.MonoBehaviours.Gui.Input;
 using NitroxClient.MonoBehaviours.Gui.Input.KeyBindings;
 using NitroxModel.Helper;
-using SteamVRRef::Valve.VR;
 using UnityEngine.InputSystem;
 
 namespace NitroxPatcher.Patches.Persistent;
@@ -24,11 +22,8 @@ public partial class GameInputSystem_Initialize_Patch : NitroxPatch, IPersistent
 
     public static void Prefix(GameInputSystem __instance)
     {
-        SteamVR.Initialize();
-        SteamVR.settings.trackingSpace = ETrackingUniverseOrigin.TrackingUniverseSeated;
-       
-        SteamVrGameInput.IsSteamVrReady = SteamVR.initializedState == SteamVR.InitializedStates.InitializeSuccess;
         VROptions.gazeBasedCursor = true;
+        SteamHelper.InitializeSteamVr();
 
         // CachedEnumString<GameInput.Button> actionNames = GameInput.ActionNames;
         //
