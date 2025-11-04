@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
+using Nitrox.Vr;
 using NitroxClient.GameLogic.HUD;
 using NitroxModel.Helper;
 
@@ -19,6 +20,11 @@ public sealed partial class uGUI_PDA_Initialize_Patch : NitroxPatch, IDynamicPat
     internal static readonly OpCode INJECTION_OPCODE = OpCodes.Stfld;
     internal static readonly object INJECTION_OPERAND = Reflect.Field((uGUI_PDA t) => t.tabs);
 
+    public static void Postfix()
+    {
+        PdaConfigure.ModifyPdaUi();
+    }
+    
     public static IEnumerable<CodeInstruction> Transpiler(MethodBase original, IEnumerable<CodeInstruction> instructions)
     {
         Validate.NotNull(INJECTION_OPERAND);

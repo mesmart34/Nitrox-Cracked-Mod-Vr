@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Nitrox.Vr;
 using NitroxModel.Helper;
 
 namespace NitroxPatcher.Patches.Dynamic;
@@ -10,5 +11,14 @@ public sealed partial class ArmsController_Start_Patch : NitroxPatch, IDynamicPa
     public static void Postfix(ArmsController __instance)
     {
         __instance.Reconfigure(null);
+
+        ControllerRig rig = ControllerRig.Instance;
+        if (rig == null)
+        {
+            return;
+        }
+        
+        rig.transform.position = __instance.transform.position;
+        rig.transform.rotation = __instance.transform.rotation;
     }
 }

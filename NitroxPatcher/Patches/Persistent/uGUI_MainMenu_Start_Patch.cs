@@ -40,7 +40,9 @@ public sealed partial class uGUI_MainMenu_Start_Patch : NitroxPatch, IPersistent
         if (Settings.IsVrEnabled)
         {
             GameObject controllerRig = new(nameof(ControllerRig));
-            ControllerRig.Instance = controllerRig.AddComponent<ControllerRig>();
+            ControllerRig rig = controllerRig.AddComponent<ControllerRig>();
+            rig.Initialize();
+            
             DontDestroyOnLoad(controllerRig);
         }
 

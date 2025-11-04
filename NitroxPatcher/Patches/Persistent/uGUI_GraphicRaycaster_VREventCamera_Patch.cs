@@ -23,7 +23,7 @@ public sealed partial class uGUI_GraphicRaycaster_VREventCamera_Patch : NitroxPa
         }
         else
         {
-           // __result = ControllerRig.Instance.WorldControllerCamera;
+            __result = CameraHelper.GetWorldCamera;
         }
         
         return false;

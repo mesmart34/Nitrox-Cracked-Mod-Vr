@@ -14,39 +14,26 @@ public class ControllerRig : MonoBehaviour
     private Camera camera = null!;
 
     private Hand mainHand = Hand.Right;
-    
-    private LineRenderer lineRenderer = null!;
-    private Vector3? endPosition;
+
+    private LaserPointer laserPointer = null!;
 
     public static ControllerRig Instance { get; set; } = null!;
-    
-    private const float LINE_START_WIDTH = 0.004f;
-    private const float LINE_END_WIDTH = 0.005f;
-    private const float LENGTH = 5.0f;
-    private static readonly Color startColor = new(0f, 1f, 1f, 1f);
-    private static readonly Color endColor = new(0f, 1f, 1f, 1f);
+
+    public void Initialize()
+    {
+        Instance = this;
+        laserPointer = gameObject.AddComponent<LaserPointer>();
+        laserPointer.Initialize();
+    }
 
     private void Start()
     {
         camera = Camera.main!;
         
         transform.SetParent(camera.transform.parent);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
+        transform.Reset();
         
         CreateHands();
-        
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
-        
-        Material material = new(ShaderManager.preloadedShaders.DebugDisplaySolid);
-        material.SetColor(ShaderPropertyID._Color, Color.cyan);
-        
-        lineRenderer.material = material;
-        lineRenderer.startColor = startColor;
-        lineRenderer.endColor = endColor;
-        lineRenderer.startWidth = LINE_START_WIDTH;
-        lineRenderer.endWidth = LINE_END_WIDTH;
-        lineRenderer.gameObject.layer = LayerMask.NameToLayer("UI");
         
         // SetMainHand(Settings.DefaultHand);
     }
@@ -64,27 +51,7 @@ public class ControllerRig : MonoBehaviour
             mainHand = Hand.Right;
             // SetMainHand(mainHand);
         }
-
-        Camera? eventCamera = GetActiveEventCamera();
-        if (eventCamera != null && endPosition != null)
-        {
-            Vector3 startPosition = eventCamera.transform.position - eventCamera.transform.up * 0.05f;
-            lineRenderer.SetPositions([startPosition, endPosition.Value]);
-        }
     }
-
-    // private void SetMainHand(Hand hand)
-    // {
-    //     Hands.ForEach(x =>
-    //     {
-    //         x.Value.SetPointerEnabled(hand == x.Key);
-    //     });
-    // }
-
-    // public void SetModelsEnabled(bool renderEnabled)
-    // {
-    //     Hands.ForEach(x => x.Value.SetModelEnabled(renderEnabled));
-    // }
 
     public void CreateHands()
     {
@@ -106,10 +73,5 @@ public class ControllerRig : MonoBehaviour
            return value.GetEventCamera();
         }
         return null;
-    }
-
-    public void SetPointerTarget(Vector3 pointerPosition)
-    {
-        endPosition = pointerPosition;
     }
 }

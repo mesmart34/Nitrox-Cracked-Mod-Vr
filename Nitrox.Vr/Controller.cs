@@ -30,10 +30,8 @@ public class Controller : MonoBehaviour
         gameObject.layer = LayerID.UI;
         
         gameObject.transform.SetParent(RigTransform);
-        
-        gameObject.transform.localPosition = Vector3.zero;
-        gameObject.transform.localRotation = Quaternion.identity;
-        gameObject.transform.localScale = Vector3.one;
+
+        gameObject.transform.Reset();
         
         InitSteamVrController();
     
@@ -50,8 +48,7 @@ public class Controller : MonoBehaviour
         eventCamera.fieldOfView = 1.0f;
         eventCamera.enabled = false;
         cameraObject.transform.SetParent(gameObject.transform);
-        cameraObject.transform.localPosition = Vector3.zero;
-        cameraObject.transform.localRotation = Quaternion.identity;
+        cameraObject.transform.Reset();
         cameraObject.transform.Rotate(45, 0, 0);
     }
 

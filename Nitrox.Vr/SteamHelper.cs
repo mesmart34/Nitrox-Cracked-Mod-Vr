@@ -22,7 +22,9 @@ public static class SteamHelper
     public static bool Ready { get; set; }
     
     public static bool InputLocked = false;
-    
+
+    public static bool SnapTurned { get; set; } = false;
+
     public static bool ShouldIgnoreButton(GameInput.Button action)
     {
         return InputLocked || buttonsToIgnore.Contains(action) || action.ToString() == "45" || action.ToString() == "46";
