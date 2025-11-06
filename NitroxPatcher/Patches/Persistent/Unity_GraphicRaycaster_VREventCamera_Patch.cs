@@ -13,7 +13,6 @@ public sealed partial class Unity_GraphicRaycaster_VREventCamera_Patch : NitroxP
     
     public static bool Prefix(GraphicRaycaster __instance, ref Camera __result)
     {
-        // TODO: Clean this up
         Canvas canvas = __instance.GetComponent<Canvas>();
         if (canvas == null)
         {
@@ -27,11 +26,7 @@ public sealed partial class Unity_GraphicRaycaster_VREventCamera_Patch : NitroxP
         {
             return true;
         }
-        Camera camera = ControllerRig.Instance.GetActiveEventCamera();
-        if (camera != null)
-        {
-            __result = camera;
-        }
+        __result = ControllerRig.Instance.EventCamera;
         return false;
     }
 }

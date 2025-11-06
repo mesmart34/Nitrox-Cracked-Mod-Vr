@@ -20,10 +20,9 @@ namespace NitroxPatcher.Patches.Persistent
                 leftData.position = __instance.lastRaycastResult.worldPosition;
                 position = __instance.lastRaycastResult.worldPosition;
             }
-
-            if (LaserPointer.Instance != null)
+            if(ControllerRig.Instance != null)
             {
-                LaserPointer.Instance.SetPointerTarget(position);
+                ControllerRig.Instance.SetPointerTargetPosition(position);
             }
         }
     }

@@ -14,12 +14,8 @@ public sealed partial class FPSInputModule_GetCursorScreenPosition_Patch : Nitro
         {
             return;
         }
-        
-        Camera eventCamera = ControllerRig.Instance.GetActiveEventCamera();
-        
-        if(eventCamera != null)
-        {
-            __result = new Vector2(eventCamera.pixelWidth * 0.5f, eventCamera.pixelHeight * 0.5f);
-        }
+
+        Camera eventCamera = ControllerRig.Instance.EventCamera;
+        __result = new Vector2(eventCamera.pixelWidth * 0.5f, eventCamera.pixelHeight * 0.5f);
     }
 }

@@ -19,15 +19,12 @@ public class Controller : MonoBehaviour
     private SteamVR_Action_Pose actionPose = null!;
     
     private SteamVR_RenderModel steamVRRenderModel = null!;
-    
-    private Camera eventCamera = null!;
+    public Camera EventCamera { get; private set; } = null!;
 
     public void Initialize(Hand handType, Transform rigTransform)
     {
         HandType = handType;
         RigTransform = rigTransform;
-
-        gameObject.layer = LayerID.UI;
         
         gameObject.transform.SetParent(RigTransform);
 
@@ -40,28 +37,19 @@ public class Controller : MonoBehaviour
 
     private void CreateEventCamera()
     {
-        GameObject cameraObject = new GameObject("EventCamera");
-        eventCamera = cameraObject.AddComponent<Camera>();
-        eventCamera.stereoTargetEye = StereoTargetEyeMask.None;
-        eventCamera.nearClipPlane = 0.01f;
-        eventCamera.farClipPlane = 10.0f;
-        eventCamera.fieldOfView = 1.0f;
-        eventCamera.enabled = false;
-        cameraObject.transform.SetParent(gameObject.transform);
-        cameraObject.transform.Reset();
+        GameObject cameraObject = new(nameof(EventCamera));
+        EventCamera = cameraObject.AddComponent<Camera>();
+        EventCamera.stereoTargetEye = StereoTargetEyeMask.None;
+        EventCamera.nearClipPlane = 0.01f;
+        EventCamera.farClipPlane = 10.0f;
+        EventCamera.fieldOfView = 1.0f;
+        EventCamera.enabled = false;
+        
+        cameraObject.transform.SetParentAndReset(gameObject.transform);
         cameraObject.transform.Rotate(45, 0, 0);
     }
 
-    public void SetModelEnabled(bool modelEnabled)
-    {
-        steamVRRenderModel.enabled = modelEnabled;
-    }
-
-    // public void SetPointerEnabled(bool pointerEnabled)
-    // {
-    //     laserPointer.AliveOrNull()?.SetEnabled(pointerEnabled);
-    // }
-
+    
     public void Update()
     {
         transform.localPosition = actionPose.localPosition;
@@ -91,9 +79,10 @@ public class Controller : MonoBehaviour
         behaviourPose.inputSource = inputSource;
         behaviourPose.poseAction = actionPose;
     }
-    
-    public Camera GetEventCamera()
+
+    public void SetLayer(int layerId)
     {
-        return eventCamera;
+        gameObject.layer = layerId;
+        steamVRRenderModel.useGUILayout = layerId == LayerID.UI;
     }
 }

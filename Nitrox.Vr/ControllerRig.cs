@@ -1,6 +1,7 @@
 extern alias SteamVRRef;
 extern alias SteamVRActions;
 using Nitrox.Vr.Common;
+using NitroxModel.Logger;
 using UnityEngine;
 
 namespace Nitrox.Vr;
@@ -17,6 +18,10 @@ public class ControllerRig : MonoBehaviour
 
     private LaserPointer laserPointer = null!;
 
+    public Controller ActiveHand => Hands[mainHand];
+
+    public Camera EventCamera => ActiveHand.EventCamera;
+
     public static ControllerRig Instance { get; set; } = null!;
 
     public void Initialize()
@@ -24,18 +29,15 @@ public class ControllerRig : MonoBehaviour
         Instance = this;
         laserPointer = gameObject.AddComponent<LaserPointer>();
         laserPointer.Initialize();
-    }
 
-    private void Start()
-    {
         camera = Camera.main!;
-        
+
         transform.SetParent(camera.transform.parent);
         transform.Reset();
-        
+
         CreateHands();
-        
-        // SetMainHand(Settings.DefaultHand);
+
+        // SetupHandReticleOnHand(SNCameraRoot.main.guiCamera, ActiveHand.transform);
     }
 
     private void Update()
@@ -43,14 +45,15 @@ public class ControllerRig : MonoBehaviour
         if (GameInput.GetButtonDown(GameInput.Button.LeftHand))
         {
             mainHand = Hand.Left;
-            // SetMainHand(mainHand);
         }
-        
+
         if (GameInput.GetButtonDown(GameInput.Button.RightHand))
         {
             mainHand = Hand.Right;
-            // SetMainHand(mainHand);
         }
+        Log.Info($"Event camera: {EventCamera.transform.position}");
+        
+        laserPointer.SetPointerOriginTransform(ActiveHand.transform.position);
     }
 
     public void CreateHands()
@@ -58,7 +61,7 @@ public class ControllerRig : MonoBehaviour
         Hands.Add(Hand.Left, CreateController(Hand.Left, camera.transform.parent));
         Hands.Add(Hand.Right, CreateController(Hand.Right, camera.transform.parent));
     }
-    
+
     private static Controller CreateController(Hand hand, Transform parent)
     {
         Controller? controller = new GameObject($"{hand}").AddComponent<Controller>();
@@ -66,12 +69,37 @@ public class ControllerRig : MonoBehaviour
         return controller;
     }
 
-    public Camera? GetActiveEventCamera()
+    public void SetPointerTargetPosition(Vector3? targetPosition)
     {
-        if (Hands.TryGetValue(mainHand, out Controller value))
+        laserPointer.SetPointerTarget(targetPosition);
+    }
+    
+    public void SetWorldTarget(GameObject target, float distance)
+    {
+        Log.Info($"target name: {target.gameObject.name}");
+        DebugPanel.Show(target.gameObject.name);
+    }
+
+    public void SetLayer(int layerID)
+    {
+        Hands.ForEach(x => x.Value.SetLayer(layerID));
+    }
+    
+    public static void SetupHandReticleOnHand(Camera uiCamera, Transform rightControllerUI)
+    {
+        GameObject handReticle = HandReticle.main.gameObject;
+        handReticle.transform.SetParent(rightControllerUI.transform, true);
+        
+        Canvas canvas = handReticle.GetComponent<Canvas>();
+        if(canvas == null)
         {
-           return value.GetEventCamera();
+            canvas = handReticle.AddComponent<Canvas>();
+            
         }
-        return null;
+        canvas.worldCamera = uiCamera;
+        
+        handReticle.transform.localEulerAngles = new Vector3(90, 0, 0);
+        handReticle.transform.localPosition = new Vector3(0, 0, 0.05f);
+        handReticle.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
     }
 }

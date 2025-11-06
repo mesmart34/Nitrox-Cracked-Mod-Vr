@@ -11,4 +11,10 @@ public static class TransformExtension
         transform.localScale = Vector3.one;
         return transform;
     }
+
+    public static Transform SetParentAndReset(this Transform transform, Transform parent)
+    {
+        transform.SetParent(parent);
+        return transform.Reset();
+    }
 }

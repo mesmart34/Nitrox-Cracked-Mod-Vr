@@ -19,11 +19,11 @@ public sealed partial class uGUI_GraphicRaycaster_VREventCamera_Patch : NitroxPa
         
         if (!(SNCameraRoot.main != null) || __instance.guiCameraSpace)
         {
-            __result = ControllerRig.Instance.GetActiveEventCamera();
+            __result = ControllerRig.Instance.EventCamera;
         }
         else
         {
-            __result = CameraHelper.GetWorldCamera;
+            __result = ControllerRig.Instance.EventCamera;//world
         }
         
         return false;

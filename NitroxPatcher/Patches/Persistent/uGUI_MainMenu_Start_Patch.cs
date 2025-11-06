@@ -42,8 +42,7 @@ public sealed partial class uGUI_MainMenu_Start_Patch : NitroxPatch, IPersistent
             GameObject controllerRig = new(nameof(ControllerRig));
             ControllerRig rig = controllerRig.AddComponent<ControllerRig>();
             rig.Initialize();
-            
-            DontDestroyOnLoad(controllerRig);
+            rig.SetLayer(LayerID.UI);
         }
 
 #if DEBUG
