@@ -77,11 +77,12 @@ public class ControllerRig : MonoBehaviour
     public void SetWorldTarget(GameObject target, float distance)
     {
         Log.Info($"target name: {target.gameObject.name}");
-        DebugPanel.Show(target.gameObject.name);
+        // DebugPanel.Show(target.gameObject.name);
     }
 
     public void SetLayer(int layerID)
     {
+        laserPointer.gameObject.layer = layerID;
         Hands.ForEach(x => x.Value.SetLayer(layerID));
     }
     

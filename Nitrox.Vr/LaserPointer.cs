@@ -26,7 +26,7 @@ public class LaserPointer : MonoBehaviour
         lineRenderer.endColor = endColor;
         lineRenderer.startWidth = LINE_START_WIDTH;
         lineRenderer.endWidth = LINE_END_WIDTH;
-        lineRenderer.gameObject.layer = LayerMask.NameToLayer("UI");
+        // lineRenderer.gameObject.layer = LayerMask.NameToLayer("UI");
     }
 
     public void SetEnabled(bool value)
@@ -36,13 +36,13 @@ public class LaserPointer : MonoBehaviour
 
     private void Update()
     {
-        Log.Info($"Laser Update [origin = {startPosition}, target = {endPosition}]");
-        if (endPosition == null || endPosition == null)
+        if (endPosition == null || startPosition == null)
         {
             lineRenderer.enabled = false;
             return;
         }
 
+        // Log.Info($"Laser Update [origin = {startPosition}, target = {endPosition}]");
         lineRenderer.enabled = true;
         lineRenderer.SetPositions([startPosition!.Value, endPosition.Value]);
     }
